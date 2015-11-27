@@ -39,10 +39,10 @@ func TestEncodeNested(t *testing.T) {
 		{11, TagNone, "renamed", []int{1, 2}, reflect.StructField{}},
 	}
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, v.FieldByIndex(actual[0].Index).Int(), 13)
-	assert.Equal(t, v.FieldByIndex(actual[1].Index).Int(), 12)
-	assert.Equal(t, v.FieldByIndex(actual[2].Index).Int(), 14)
-	assert.Equal(t, v.FieldByIndex(actual[3].Index).Int(), 15)
+	assert.EqualValues(t, 13, v.FieldByIndex(actual[0].Index).Int())
+	assert.EqualValues(t, 12, v.FieldByIndex(actual[1].Index).Int())
+	assert.EqualValues(t, 14, v.FieldByIndex(actual[2].Index).Int())
+	assert.EqualValues(t, 15, v.FieldByIndex(actual[3].Index).Int())
 }
 
 type TestDuplicateID struct {
@@ -55,4 +55,23 @@ func TestDuplicateIDNotAllowed(t *testing.T) {
 		v := reflect.TypeOf(&TestDuplicateID{})
 		ProtoFields(v)
 	})
+}
+
+type NotInit struct{
+	A string
+	B []byte
+}
+
+func TestNotInitialised(t *testing.T){
+	s := &NotInit{A: "string"}
+	sb, err := Encode(s)
+	if err != nil{
+		t.Fatal("Couldn't encode structure:", err )
+	}
+
+	sd := &NotInit{}
+	err = Decode(sb, sd)
+	if err != nil{
+		t.Fatal("Couldn't decode structure:", err)
+	}
 }
