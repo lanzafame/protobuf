@@ -217,3 +217,31 @@ func TestTimeTypesEncodeDecode(t *testing.T) {
 	assert.Equal(t, in.Time.UnixNano(), out.Time.UnixNano())
 	assert.Equal(t, in.Duration, out.Duration)
 }
+
+type InnerStruct struct {
+	Field1 int32
+}
+
+type OuterStruct struct {
+	FirstField int32
+	LastField *InnerStruct
+}
+
+
+func TestLastFieldStructDecode(t *testing.T) {
+	in := &OuterStruct{
+		FirstField: 1,
+		/*LastField: &InnerStruct{
+			Field1: 2,
+		},*/
+	}
+	buf, err := Encode(in)
+	assert.NoError(t, err)
+	out := &OuterStruct{}
+	err = Decode(buf, out)
+	assert.NoError(t, err)
+	assert.Equal(t, int32(1), out.FirstField)
+	//assert.Equal(t, in.LastField.Field1, out.LastField.Field1)
+}
+
+
